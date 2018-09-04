@@ -35,15 +35,15 @@ public class MatchDelimiters<E> {
     private int size = 0;
     public MatchDelimiters(){
         head = new Node<>(null, null, null);
-        tail = new Node<>(null, head, null);
+        tail = new Node<>(null, null, head);
         head.setNext(tail);
     }
 
-    public int getSize() {
+    private int getSize() {
         return this.size;
     }
 
-    public boolean isEmpty() {
+    private boolean isEmpty() {
         return this.size == 0;
     }
 
@@ -52,7 +52,7 @@ public class MatchDelimiters<E> {
 //        return head.getNext().getElement();
 //    }
 
-    public E last() {
+    private E last() {
         if (isEmpty()) return null;
         return tail.getPrev().getElement();
     }
@@ -61,7 +61,7 @@ public class MatchDelimiters<E> {
 //        addBetween(e, head, head.getNext());
 //    }
 
-    public void push (E e) {
+    private void push (E e) {
         addBetween(e, tail.getPrev(), tail);
     }
 
@@ -70,13 +70,36 @@ public class MatchDelimiters<E> {
 //        return remove(head.getNext());
 //    }
 
-    public E pop() {
+    private E pop() {
         if(isEmpty()) return null;
         return remove(tail.getPrev());
     }
 
+    public boolean match(E[] e){
+        for (int i = 0; i < e.length; i++){
+            if (e[i].equals("(")  || e[i].equals("[")  || e[i].equals("{")){
+                push(e[i]);
+            }
+            else if (e[i].equals(")")  || e[i].equals("]")  || e[i].equals("}")){
+                if (isEmpty()) return false;
+//                System.out.println(pop());
+//                if (!pop().equals(e[i]))return false;
+                if (e[i].equals(")")){
+                    if (!pop().equals("("))return false;
+                }
+                else if (e[i].equals("]")){
+                    if (!pop().equals("["))return false;
+                }
+                else if (!pop().equals("{"))return false;
+            }
+        }
+        if (isEmpty()) return true;
+        else return false;
+    }
+
+
     private void addBetween(E e, Node<E> predecessor, Node<E> successor) {
-        Node<E> newest = new Node<>(e, predecessor, successor);
+        Node<E> newest = new Node<>(e, successor, predecessor);
         predecessor.setNext(newest);
         successor.setPrev(newest);
         size++;
@@ -93,10 +116,7 @@ public class MatchDelimiters<E> {
 
     public static void main(String[] args){
         MatchDelimiters testList = new MatchDelimiters();
-        System.out.println(""+testList.size +" " + testList.isEmpty());
-        testList.push(5);
-        testList.push(6);
-        System.out.println(""+testList.getSize() +" " + testList.isEmpty() + " " + testList.last());
-        System.out.println(testList.pop());
+        String[] test1 = new String[]{"(",")","(","(",")",")","{","(","[","(",")","]",")","}",};
+        System.out.println(testList.match(test1));
     }
 }

@@ -35,7 +35,7 @@ public class DoubleLinkedStack<E> {
     private int size = 0;
     public DoubleLinkedStack(){
         head = new Node<>(null, null, null);
-        tail = new Node<>(null, head, null);
+        tail = new Node<>(null, null, head);
         head.setNext(tail);
     }
 
@@ -76,7 +76,7 @@ public class DoubleLinkedStack<E> {
     }
 
     private void addBetween(E e, Node<E> predecessor, Node<E> successor) {
-        Node<E> newest = new Node<>(e, predecessor, successor);
+        Node<E> newest = new Node<>(e, successor, predecessor);
         predecessor.setNext(newest);
         successor.setPrev(newest);
         size++;
