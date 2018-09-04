@@ -82,8 +82,6 @@ public class MatchDelimiters<E> {
             }
             else if (e[i].equals(")")  || e[i].equals("]")  || e[i].equals("}")){
                 if (isEmpty()) return false;
-//                System.out.println(pop());
-//                if (!pop().equals(e[i]))return false;
                 if (e[i].equals(")")){
                     if (!pop().equals("("))return false;
                 }
@@ -117,6 +115,8 @@ public class MatchDelimiters<E> {
     public static void main(String[] args){
         MatchDelimiters testList = new MatchDelimiters();
         String[] test1 = new String[]{"(",")","(","(",")",")","{","(","[","(",")","]",")","}",};
+        String[] test2 = new String[]{"(","{","[","]",")","}",};
         System.out.println(testList.match(test1));
+        System.out.println(testList.match(test2));
     }
 }

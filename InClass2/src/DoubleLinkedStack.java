@@ -96,8 +96,8 @@ public class DoubleLinkedStack<E> {
         System.out.println(""+testList.size +" " + testList.isEmpty());
         testList.push(5);
         testList.push(6);
-//        System.out.println(""+testList.getSize() +" " + testList.isEmpty() + " " + testList.last());
-//        System.out.println(testList.pop());
+        testList.push(20);
+        System.out.println(""+testList.getSize());
         while (!testList.isEmpty()){
             System.out.println(testList.pop());
         }
