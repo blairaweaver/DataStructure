@@ -97,9 +97,6 @@ public class DoubleLink<E> {
         testList.addFirst(3);
         testList.addLast(5);
         testList.addLast(6);
-//        System.out.println(""+testList.getSize() +" " + testList.isEmpty() + " " + testList.last() + " " + testList.first());
-//        System.out.println(testList.removeFirst());
-//        System.out.println(testList.removeLast());
         while (!testList.isEmpty()){
             System.out.println(testList.removeFirst());
         }
