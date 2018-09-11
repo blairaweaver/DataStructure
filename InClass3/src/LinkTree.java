@@ -55,7 +55,7 @@ public class LinkTree<E> {
 
     private BinaryTreeNode<E> root;
     private int size = 0;
-    public int height = 0;
+    private int height = 0;
     public LinkTree(E e){
         this.root = new BinaryTreeNode<>(e, null);
         size++;
@@ -105,7 +105,26 @@ public class LinkTree<E> {
         System.out.println(e.getElement());
     }
 
-    public static void main(String[] args){
+    public void addLayer(BinaryTreeNode<E> parent, E left, E right) {
+        BinaryTreeNode leftChild = new BinaryTreeNode<>(left, parent);
+        BinaryTreeNode rightChild = new BinaryTreeNode<>(right, parent);
+        parent.setLeftChild(leftChild);
+        parent.setRightChild(rightChild);
+        if (getHeightAtNode(leftChild) > height) {
+            height = getHeightAtNode(leftChild);
+        }
+    }
 
+    public int getHeightAtNode(BinaryTreeNode<E> e){
+//        root returns zero since the first call will add to the total
+        if (e.getParent() == null) return 0;
+        else return 1 + getHeightAtNode(e.getParent());
+    }
+
+    public int getHeight() {return height;}
+
+    public static void main(String[] args){
+        LinkTree test = new LinkTree<>('+');
+        System.out.println(test.isEmpty());
     }
 }
