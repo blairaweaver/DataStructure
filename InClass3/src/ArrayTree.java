@@ -6,8 +6,11 @@ public class ArrayTree {
     public Object getRoot() {return data[0];}
     public int getSize() {return size;}
     public int getHeight() {return height;}
-    public ArrayTree(Object root) {
-        data = new Object[50];
+    public ArrayTree(int capacity) {
+        data = new Object[capacity];
+    }
+    public ArrayTree(Object root, int capacity) {
+        data = new Object[capacity];
         data[0] = root;
         size++;
     }
@@ -26,10 +29,12 @@ public class ArrayTree {
         else return data[(childIndex - 2) / 2];
     }
     public void setLeftChild(int parentIndex, Object child) {
+        if (2 * parentIndex + 1 >= data.length) expandTree(data.length * 2);
         data[2 * parentIndex + 1] = child;
         size++;
     }
     public void setRightChild(int parentIndex, Object child) {
+        if (2 * parentIndex + 2 >= data.length) expandTree(data.length * 2);
         data[2 * parentIndex + 2] = child;
         size++;
     }
@@ -70,5 +75,13 @@ public class ArrayTree {
         if (getLeftChild(index) != null) inOrder(index * 2 + 1);
         if (getRightChild(index) != null) inOrder(index * 2 + 2);
         System.out.println(data[index]);
+    }
+
+    public void expandTree(int newCapacity) {
+        Object[] temp = new Object[newCapacity];
+        for (int i = 0; i < data.length; i++) {
+            temp[i] = data [i];
+        }
+        data = temp;
     }
 }

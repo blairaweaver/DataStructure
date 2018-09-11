@@ -56,6 +56,9 @@ public class LinkTree<E> {
     private BinaryTreeNode<E> root;
     private int size = 0;
     private int height = 0;
+    public LinkTree() {
+        root = null;
+    }
     public LinkTree(E e){
         this.root = new BinaryTreeNode<>(e, null);
         size++;
