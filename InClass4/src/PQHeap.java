@@ -20,6 +20,7 @@ public class PQHeap {
         data = new int[x.length];
         this.capacity = x.length;
         lastNode = -1;
+//        A simple insert method to building
 //        buildSim(x);
         build(x);
     }
@@ -37,25 +38,10 @@ public class PQHeap {
         return parentIndex * 2 + 1;
     }
 
-    private int getParent(int childIndex) {
-        if (childIndex % 2 == 1) return data[(childIndex - 1) / 2];
-        else return data[(childIndex - 2) / 2];
-    }
-
     private int getParentIndex(int childIndex) {
         if (childIndex % 2 == 1) return (childIndex - 1) / 2;
         else return (childIndex - 2) / 2;
     }
-//    private void setLeftChild(int parentIndex, Object child) {
-//        if (2 * parentIndex + 1 >= data.length) expandTree(data.length * 2);
-//        data[2 * parentIndex + 1] = child;
-//        size++;
-//    }
-//    private void setRightChild(int parentIndex, Object child) {
-//        if (2 * parentIndex + 2 >= data.length) expandTree(data.length * 2);
-//        data[2 * parentIndex + 2] = child;
-//        size++;
-//    }
 
     public void insert(int x){
         if (lastNode + 1 >= capacity) {
@@ -133,13 +119,14 @@ public class PQHeap {
     }
 
     public void build(int[] x) {
+        lastNode = x.length - 1;
         int h = (int) Math.ceil((Math.log(x.length + 1)/Math.log(2)) -1);
         for (int i = (int) Math.pow(2, h) - 1; i < x.length; i++){
             data[i] = x[i];
         }
         h--;
         for (int j = h; j >= 0; j--) {
-            for (int i = (int) Math.pow(2, h) - 1; i < x.length; i++) {
+            for (int i = (int) Math.pow(2, j) - 1; i < (int) Math.pow(2, j + 1) - 1; i++) {
                 data[i] = x[i];
                 downHeap(i);
             }
@@ -149,23 +136,22 @@ public class PQHeap {
     public void inOrder(int index){
         if (index > lastNode) return;
         if (getLeftChildIndex(index) != -1) inOrder(getLeftChildIndex(index));
-        System.out.print(data[index]);
+        System.out.print(data[index] + " ");
         if (getRightChildIndex(index) != -1) inOrder(getRightChildIndex(index));
     }
 
     public void print() {
         for (int i = 0; i < data.length; i ++) {
-            System.out.print(data[i]);
+            System.out.print(data[i] + " ");
         }
     }
 
     public static void main(String[] args) {
-        int[] testA = new int[10];
+        int[] testA = new int[20];
         Random rand = new Random();
         rand.setSeed(System.currentTimeMillis());
         for (int i = 0; i < testA.length; i++){
             testA[i] = rand.nextInt(testA.length);
-            System.out.print(testA[i]);
         }
         System.out.println();
         PQHeap test = new PQHeap(testA);
