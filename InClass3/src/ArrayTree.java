@@ -63,8 +63,8 @@ public class ArrayTree {
         else return false;
     }
     public boolean isExternal(int index) {
-        if (getRightChild(index) != null || getLeftChild(index) != null) return true;
-        else return false;
+        if (getRightChild(index) != null || getLeftChild(index) != null) return false;
+        else return true;
     }
     public void inOrder(int index){
         if (index >= capacity -1) return;
