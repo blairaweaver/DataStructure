@@ -136,9 +136,9 @@ public class BinarySearchTree<K extends Comparable<K>, E> {
 //        If the node only has null children
         if (isExternal(search.getLeftChild()) && isExternal(search.getRightChild())) {
             if (dir == -1) {
-                parent.setLeftChild(null);
+                parent.setLeftChild(new BinaryTreeNode<>(null, null, parent));
             }
-            else parent.setRightChild(null);
+            else parent.setRightChild(new BinaryTreeNode<>(null, null, parent));
             return;
         }
 
