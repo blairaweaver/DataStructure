@@ -243,7 +243,7 @@ public class AVL<K extends Comparable<K>, E> {
         }
         else {
             if (isInternal(e.getRightChild()) && isInternal(e.getLeftChild())) {
-                AVLNode<K, E> replacement = findMax(e);
+                AVLNode<K, E> replacement = findMax(e.getLeftChild());
                 set(e, replacement);
                 e = replacement;
             }
@@ -275,6 +275,7 @@ public class AVL<K extends Comparable<K>, E> {
         old.setElement(e);
     }
 
+//    This isn't used and has errors
     private AVLNode<K, E> findMax(AVLNode<K, E> start) {
         if (isInternal(start.getRightChild())) return findMax(start.getRightChild());
         else return start;
@@ -286,21 +287,6 @@ public class AVL<K extends Comparable<K>, E> {
     }
 
     public static void main(String[] args){
-        AVL test = new AVL(6, '6');
-        test.insert(2, '2');
-        test.insert(1, '1');
-        test.insert(4, '4');
-        test.insert(9, '9');
-        test.insert(8, '8');
-        System.out.println(test.treeSearch(4, test.root).getKey());
-        test.inOrder(test.root);
-        test.insert(5, '5');
-        System.out.println();
-        test.inOrder(test.root);
-        test.delete(4);
-        System.out.println();
-        test.inOrder(test.root);
-
         AVL test2 = new AVL(1, '1');
         test2.insert(3, '3');
         test2.insert(2, '2');
@@ -308,9 +294,11 @@ public class AVL<K extends Comparable<K>, E> {
         test2.insert(9, '9');
         test2.insert(6, '6');
         test2.insert(5, '5');
-        System.out.println();
         test2.inOrder(test2.root);
         test2.delete(3);
+        System.out.println();
+        test2.inOrder(test2.root);
+        test2.delete(8);
         System.out.println();
         test2.inOrder(test2.root);
     }
