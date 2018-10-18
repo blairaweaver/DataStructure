@@ -2,6 +2,7 @@ public class AVL<K extends Comparable<K>, E> {
     private static class AVLNode<K, E>{
         private E element;
         private K key;
+        private int aux;
         private AVLNode<K, E> parent;
         private AVLNode<K, E> leftChild;
         private AVLNode<K, E> rightChild;
@@ -9,6 +10,7 @@ public class AVL<K extends Comparable<K>, E> {
             this.element = e;
             this.key = k;
             this.parent = p;
+            this.aux = 0;
             this.leftChild = null;
             this.rightChild = null;
         }
@@ -17,7 +19,17 @@ public class AVL<K extends Comparable<K>, E> {
             return element;
         }
 
-        public K getKey() {return key;}
+        public K getKey() {
+            return key;
+        }
+
+        public int getAux() {
+            return aux;
+        }
+
+        public void setAux(int aux) {
+            this.aux = aux;
+        }
 
         public void setElement(E element) {
             this.element = element;
@@ -51,6 +63,12 @@ public class AVL<K extends Comparable<K>, E> {
             this.rightChild = r;
         }
 
+        public AVLNode<K, E> getSibling(){
+            AVLNode<K, E> parent = getParent();
+            if (parent.rightChild == this) return parent.leftChild;
+            else return parent.rightChild;
+        }
+
     }
 
     private AVLNode<K, E> root;
@@ -63,10 +81,17 @@ public class AVL<K extends Comparable<K>, E> {
         this.root = new AVLNode<>(k, e, null);
         root.setLeftChild(new AVLNode<>(null, null, root));
         root.setRightChild(new AVLNode<>(null, null, root));
+        root.setAux(1);
         size++;
     }
 
-    public AVLNode getRoot() {return this.root;}
+    public AVLNode getRoot() {
+        return this.root;
+    }
+
+    public int getHeight(AVLNode<K, E> e) {
+        return e.getAux();
+    }
 
     public int getSize() {
         return this.size;
@@ -77,10 +102,11 @@ public class AVL<K extends Comparable<K>, E> {
     }
 
     public boolean isExternal(AVLNode<K, E> e){
-        if (e.getElement() == null) {
-            return true;
-        }
-        else return false;
+        return e.getElement() == null;
+    }
+    
+    public boolean isInternal(AVLNode<K, E> e) {
+        return e.getElement() != null;
     }
 
     public boolean isRoot(AVLNode<K, E> e) {
@@ -104,83 +130,143 @@ public class AVL<K extends Comparable<K>, E> {
         if (e.getRightChild() != null) postOrder(e.getRightChild());
         if (e.getElement() != null) System.out.print(e.getElement());
     }
+    
+    public void set(AVLNode<K, E> oldNode, AVLNode<K, E> newNode) {
+        oldNode.setElement(newNode.getElement());
+        oldNode.setKey(newNode.getKey());
+    } 
 
-    public AVLNode<K, E> TreeSearch(K k, AVLNode<K, E> e) {
+    public void recomputeHeight(AVLNode<K, E> e) {
+        e.setAux(1 + Math.max(getHeight(e.getRightChild()), getHeight(e.getLeftChild())));
+    }
+
+    public boolean isBalanced(AVLNode<K, E> e) {
+        return Math.abs(getHeight(e.getRightChild()) - getHeight(e.getLeftChild())) <= 1;
+    }
+
+    private void relink(AVLNode<K, E> parent, AVLNode<K, E> child, boolean makeLeftChild) {
+        child.setParent(parent);
+        if (makeLeftChild) parent.setLeftChild(child);
+        else parent.setRightChild(child);
+    }
+
+    private void rotate(AVLNode<K, E> e) {
+        AVLNode<K, E> x = e;
+        AVLNode<K, E> y = e.getParent();
+        AVLNode<K, E> z = y.getParent();
+
+        if (z == null) {
+            root = x;
+            x.setParent(null);
+        }
+        else relink(z, x, y == z.getLeftChild());
+
+        if (x == y.getLeftChild()) {
+            relink(y, x.getRightChild(), true);
+            relink(x, y, false);
+        }
+        else {
+            relink(y, x.getLeftChild(), false);
+            relink(x, y, true);
+        }
+    }
+
+    private AVLNode<K, E> restucture(AVLNode<K, E> x) {
+//        return a node so that the class can continue up the tree
+        AVLNode<K, E> y = x.getParent();
+        AVLNode<K, E> z = y.getParent();
+        if ((x == y.getRightChild()) == (y == z.getRightChild())) {
+            rotate(y);
+            return y;
+        }
+        else {
+            rotate(x);
+            rotate(x);
+            return x;
+        }
+    }
+
+    private void rebalance(AVLNode<K, E> e) {
+        int oldHeight, newHeight;
+        do {
+            oldHeight = getHeight(e);
+            if (!isBalanced(e)) {
+//                find x since e is z and restructure
+                e = restucture(tallerChild(tallerChild(e)));
+                recomputeHeight(e.getLeftChild());
+                recomputeHeight(e.getRightChild());
+            }
+            recomputeHeight(e);
+            newHeight = getHeight(e);
+            e = e.getParent();
+        } while (oldHeight != newHeight && e != null);
+    }
+
+    private void rebalanceInsert(AVLNode<K, E> e) {
+        rebalance(e);
+    }
+
+    private void rebalanceDelete(AVLNode<K, E> e) {
+        if (!isRoot(e) && isInternal(e)) rebalance(e);
+        if (isExternal(e) && !isRoot(e)) rebalance(e.getParent());
+    }
+
+    public AVLNode<K, E> tallerChild(AVLNode<K, E> e) {
+        if (getHeight(e.getLeftChild()) < getHeight(e.getRightChild())) return e.getRightChild();
+        if (getHeight(e.getLeftChild()) > getHeight(e.getRightChild())) return e.getLeftChild();
+        if (isRoot(e)) return e.getLeftChild();
+        if (e == e.getParent().getLeftChild()) return e.getLeftChild();
+        else return e.getRightChild();
+    }
+
+    public AVLNode<K, E> treeSearch(K k, AVLNode<K, E> e) {
         if (isExternal(e)) return e;
         int cmp = k.compareTo(e.getKey());
-        if (cmp < 0) return TreeSearch(k, e.getLeftChild());
+        if (cmp < 0) return treeSearch(k, e.getLeftChild());
         else if (cmp == 0) return e;
-        else return TreeSearch(k, e.getRightChild());
+        else return treeSearch(k, e.getRightChild());
     }
 
     public void insert(K k, E e) {
-        AVLNode<K, E> search = TreeSearch(k, root);
-        if (isExternal(search)) add(search, k, e);
+        AVLNode<K, E> search = treeSearch(k, root);
+        if (isExternal(search)) {
+            add(search, k, e);
+            rebalanceInsert(search.parent);
+        }
         else updateNode(search, e);
     }
-
+    
     public void delete(K k) {
-        AVLNode<K, E> search = TreeSearch(k, root);
-
-//        didn't find the key in tree
-        if (isExternal(search)) return;
-
-        AVLNode<K, E> parent = search.getParent();
-
-        int dir = 0;
-//      determine if the node to delete is left or right child of parent
-        if (parent.getLeftChild() == search) {
-            dir = -1;
-        }
-
-//        If the node only has null children
-        if (isExternal(search.getLeftChild()) && isExternal(search.getRightChild())) {
-            if (dir == -1) {
-                parent.setLeftChild(new AVLNode<>(null, null, parent));
-            }
-            else parent.setRightChild(new AVLNode<>(null, null, parent));
+        AVLNode<K, E> e = treeSearch(k, getRoot());
+        if (isExternal(e)) {
             return;
         }
-
-//        If the node has one null child
-        if (isExternal(search.getLeftChild())) {
-            if (dir == -1) {
-                parent.setLeftChild(search.getRightChild());
-                search.getRightChild().setParent(parent);
-            }
-            else {
-                parent.setRightChild(search.getRightChild());
-                search.getRightChild().setParent(parent);
-            }
-            return;
-        }
-
-//        If two children, find smallest on right side to place in old node spot
-        AVLNode<K, E> minRight = findMin(search.getRightChild());
-//        Remove link from parent of smallest
-        if (minRight.getParent().getLeftChild() == minRight) {
-            minRight.getParent().setLeftChild(new AVLNode<>(null, null, minRight.getParent()));
-        }
         else {
-            minRight.getParent().setRightChild(new AVLNode<>(null, null, minRight.getParent()));
+            if (isInternal(e.getRightChild()) && isInternal(e.getLeftChild())) {
+                AVLNode<K, E> replacement = findMax(e);
+                set(e, replacement);
+                e = replacement;
+            }
         }
-//        add new link for smallest and other nodes
-        minRight.setParent(parent);
-        minRight.setRightChild(search.getRightChild());
-        minRight.setLeftChild(search.getLeftChild());
-        search.getRightChild().setParent(minRight);
-        search.getLeftChild().setParent(minRight);
-        if (dir == -1) {
-            parent.setLeftChild(minRight);
-        }
-        else {
-            parent.setRightChild(minRight);
-        }
+        AVLNode<K, E> leaf = (isExternal(e.getLeftChild()) ? e.getLeftChild() : e.getRightChild());
+        AVLNode<K, E> sib = leaf.getSibling();
+        remove(e,sib);
+        rebalanceDelete(sib);
+    }
+
+    private void remove(AVLNode<K, E> oldNode, AVLNode<K, E> newNode) {
+        AVLNode<K, E> parent = oldNode.getParent();
+        newNode.setParent(parent);
+        if (parent.getRightChild() == oldNode)
+            parent.setRightChild(newNode);
+        else
+            parent.setLeftChild(newNode);
     }
 
     private void add(AVLNode<K, E> old, K k, E e) {
         old.setKey(k);
         old.setElement(e);
+        old.setAux(1);
         old.setLeftChild(new AVLNode<>(null, null, old));
         old.setRightChild(new AVLNode<>(null, null, old));
     }
@@ -190,12 +276,12 @@ public class AVL<K extends Comparable<K>, E> {
     }
 
     private AVLNode<K, E> findMax(AVLNode<K, E> start) {
-        if (!isExternal(start.getRightChild())) return findMax(start.getRightChild());
+        if (isInternal(start.getRightChild())) return findMax(start.getRightChild());
         else return start;
     }
 
     private AVLNode<K, E> findMin(AVLNode<K, E> start) {
-        if (!isExternal(start.getLeftChild())) return findMin(start.getLeftChild());
+        if (isInternal(start.getLeftChild())) return findMin(start.getLeftChild());
         else return start;
     }
 
@@ -206,7 +292,7 @@ public class AVL<K extends Comparable<K>, E> {
         test.insert(4, '4');
         test.insert(9, '9');
         test.insert(8, '8');
-        System.out.println(test.TreeSearch(4, test.root).getKey());
+        System.out.println(test.treeSearch(4, test.root).getKey());
         test.inOrder(test.root);
         test.insert(5, '5');
         System.out.println();
