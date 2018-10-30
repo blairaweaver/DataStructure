@@ -275,7 +275,6 @@ public class AVL<K extends Comparable<K>, E> {
         old.setElement(e);
     }
 
-//    This isn't used and has errors
     private AVLNode<K, E> findMax(AVLNode<K, E> start) {
         if (isInternal(start.getRightChild())) return findMax(start.getRightChild());
         else return start;
