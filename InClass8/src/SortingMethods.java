@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class MyPair {
     private int[] array1;
     private int[] array2;
@@ -280,7 +282,7 @@ class MaxHeap {
 }
 
 public class SortingMethods {
-    public static void selectionSort(int[] x) {
+    public static int[] selectionSort(int[] x) {
         for (int i = 0; i < x.length - 1; i++) {
             int jmin = i;
             for (int j = i + 1; j < x.length; j++) {
@@ -290,9 +292,10 @@ public class SortingMethods {
             }
             swap(x, i, jmin);
         }
+        return x;
     }
 
-    public static void bubbleSort(int[] x) {
+    public static int[] bubbleSort(int[] x) {
         for (int i = x.length - 1; i > 0; i--) {
             for (int j = 0; j < i; j++) {
                 if (x[j] > x[j + 1]) {
@@ -300,9 +303,10 @@ public class SortingMethods {
                 }
             }
         }
+        return x;
     }
 
-    public static void insertionSort(int[] x) {
+    public static int[] insertionSort(int[] x) {
         for (int i = 1; i < x.length; i++) {
             int key = x[i];
             int j = i;
@@ -312,6 +316,7 @@ public class SortingMethods {
             }
             x[j] = key;
         }
+        return x;
     }
 
     public static int[] mergeSort(int[] x) {
@@ -325,6 +330,15 @@ public class SortingMethods {
         else {
             return x;
         }
+    }
+
+    public static int[] heapSort(int [] x) {
+        MaxHeap xheap = new MaxHeap(x);
+        int[] temp = new int[x.length];
+        for (int i = x.length-1; i>=0;i--){
+            temp[i] = xheap.removeMax();
+        }
+        return temp;
     }
 
     public static ModArray quickSort(ModArray A) {
@@ -420,24 +434,51 @@ public class SortingMethods {
 
     public static void main(String[] args) {
         int[] x = new int[]{10, 9 ,4 ,6, 13, 5, 2, 1};
+        System.out.println("Original Array");
+        for (int i = 0; i < x.length; i++) {
+            System.out.print(x[i] + " ");
+        }
+        System.out.println();
 
-//        ModArray quick = quickSort(new ModArray(x));
-//        for (int i = 0; i < quick.getSize(); i++) {
-//            System.out.print(quick.getElement(i) + " ");
-//        }
-//        System.out.println();
-//
-//        int[] y = mergeSort(x);
-//        for (int i = 0; i < y.length; i++) {
-//            System.out.print(y[i] + " ");
-//        }
+        System.out.println("Quick Sort");
+        ModArray quick = quickSort(new ModArray(x));
+        for (int i = 0; i < quick.getSize(); i++) {
+            System.out.print(quick.getElement(i) + " ");
+        }
+        System.out.println();
 
-//        x = new int[]{10, 9 ,4 ,6, 13, 5, 2, 1};
-        MaxHeap xheap = new MaxHeap(x);
-//        xheap.print();
-//        xheap.inOrder(0);
-        for (int i = 0; i < xheap.getCapacity(); i++) {
-            System.out.println(xheap.removeMax());
+        System.out.println("Merge Sort");
+        int[] y = mergeSort(Arrays.copyOf(x,x.length));
+        for (int i = 0; i < y.length; i++) {
+            System.out.print(y[i] + " ");
+        }
+        System.out.println();
+
+        System.out.println("Selection Sort");
+        int[] sel = selectionSort(Arrays.copyOf(x,x.length));
+        for (int i = 0; i < sel.length; i++) {
+            System.out.print(sel[i] + " ");
+        }
+        System.out.println();
+
+        System.out.println("Insertion Sort");
+        int[] insert = insertionSort(Arrays.copyOf(x,x.length));
+        for (int i = 0; i < insert.length; i++) {
+            System.out.print(insert[i] + " ");
+        }
+        System.out.println();
+
+        System.out.println("Bubble Sort");
+        int[] bubble = bubbleSort(Arrays.copyOf(x,x.length));
+        for (int i = 0; i < bubble.length; i++) {
+            System.out.print(bubble[i] + " ");
+        }
+        System.out.println();
+
+        System.out.println("Heap Sort");
+        int[] heap = heapSort(x);
+        for (int i = 0; i < heap.length; i++) {
+            System.out.print(heap[i] + " ");
         }
     }
 }
