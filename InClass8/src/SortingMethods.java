@@ -137,7 +137,147 @@ class ModArray {
     }
 }
 
-class MaxHeap {}
+class MaxHeap {
+    private int[] data;
+    private int capacity;
+    private int lastNode;
+
+    public MaxHeap(int[] x) {
+        data = new int[x.length];
+        this.capacity = x.length;
+        lastNode = -1;
+//        A simple insert method to building
+//        buildSim(x);
+        build(x);
+    }
+
+    private int getRoot(){
+        return data[0];
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    private int getRightChildIndex(int parentIndex) {
+        if (lastNode < parentIndex * 2 + 2) return -1;
+        return parentIndex * 2 + 2;
+    }
+    private int getLeftChildIndex(int parentIndex) {
+        if (lastNode < parentIndex * 2 + 1) return -1;
+        return parentIndex * 2 + 1;
+    }
+
+    private int getParentIndex(int childIndex) {
+        if (childIndex % 2 == 1) return (childIndex - 1) / 2;
+        else return (childIndex - 2) / 2;
+    }
+
+    public void insert(int x){
+        if (lastNode + 1 >= capacity) {
+            expandHeap();
+        }
+        data[lastNode + 1] = x;
+        lastNode++;
+        upHeap(lastNode);
+    }
+
+    public int max(){
+        if (lastNode != -1) {
+            return data[0];
+        }
+        else return -1;
+    }
+
+    public int removeMax() {
+        int temp = data[0];
+        data[0] = data[lastNode];
+        lastNode--;
+        downHeap(0);
+        return temp;
+    }
+
+    private void upHeap(int pos){
+        if (pos == 0) return;
+        if (data[pos] > data[getParentIndex(pos)]){ //change to data[getParentIndex(pos)] ??
+            int temp = data[pos];
+            data[pos] = data[getParentIndex(pos)]; //change to data[getParentIndex(pos)] ??
+            data[getParentIndex(pos)] = temp; //change to data[getParentIndex(pos)] ??
+            upHeap(getParentIndex(pos));
+        }
+        else return;
+    }
+
+    private void downHeap(int pos){
+        if (getRightChildIndex(pos) == -1) {
+            if (getLeftChildIndex(pos) == -1) return;
+            else if (data[getLeftChildIndex(pos)] > data[pos]){
+                int temp = data[pos];
+                data[pos] = data[getLeftChildIndex(pos)];
+                data[getLeftChildIndex(pos)] = temp;
+                return;
+            }
+            else return;
+        }
+        else if (data[getLeftChildIndex(pos)] > data[getRightChildIndex(pos)] && data[getLeftChildIndex(pos)] > data[pos]) {
+            int temp = data[pos];
+            data[pos] = data[getLeftChildIndex(pos)];
+            data[getLeftChildIndex(pos)] = temp;
+            downHeap(getLeftChildIndex(pos));
+        }
+        else if (data[getRightChildIndex(pos)] > data[getLeftChildIndex(pos)] && data[getRightChildIndex(pos)] > data[pos]) {
+            int temp = data[pos];
+            data[pos] = data[getRightChildIndex(pos)];
+            data[getRightChildIndex(pos)] = temp;
+            downHeap(getRightChildIndex(pos));
+        }
+
+        else return;
+    }
+
+    private void expandHeap() {
+        capacity = capacity * 2;
+        int[] temp = new int[capacity];
+        for (int i = 0; i < data.length; i++) {
+            temp[i] = data [i];
+        }
+        data = temp;
+    }
+
+    public void buildSim(int[] x) {
+        for (int i = 0; i < x.length; i++){
+            insert(x[i]);
+        }
+    }
+
+    public void build(int[] x) {
+        lastNode = x.length - 1;
+        int h = (int) Math.ceil((Math.log(x.length + 1)/Math.log(2)) -1);
+        for (int i = (int) Math.pow(2, h) - 1; i < x.length; i++){
+            data[i] = x[i];
+        }
+        h--;
+        for (int j = h; j >= 0; j--) {
+            for (int i = (int) Math.pow(2, j) - 1; i < (int) Math.pow(2, j + 1) - 1; i++) {
+                data[i] = x[i];
+                downHeap(i);
+            }
+        }
+    }
+
+    public void inOrder(int index){
+        if (index > lastNode) return;
+        if (getLeftChildIndex(index) != -1) inOrder(getLeftChildIndex(index));
+        System.out.print(data[index] + " ");
+        if (getRightChildIndex(index) != -1) inOrder(getRightChildIndex(index));
+    }
+
+    public void print() {
+        for (int i = 0; i < data.length; i ++) {
+            System.out.print(data[i] + " ");
+        }
+    }
+}
 
 public class SortingMethods {
     public static void selectionSort(int[] x) {
@@ -185,10 +325,6 @@ public class SortingMethods {
         else {
             return x;
         }
-    }
-
-    public static void heapSort(int[] x) {
-
     }
 
     public static ModArray quickSort(ModArray A) {
@@ -285,15 +421,23 @@ public class SortingMethods {
     public static void main(String[] args) {
         int[] x = new int[]{10, 9 ,4 ,6, 13, 5, 2, 1};
 
-        ModArray quick = quickSort(new ModArray(x));
-        for (int i = 0; i < quick.getSize(); i++) {
-            System.out.print(quick.getElement(i) + " ");
-        }
-        System.out.println();
+//        ModArray quick = quickSort(new ModArray(x));
+//        for (int i = 0; i < quick.getSize(); i++) {
+//            System.out.print(quick.getElement(i) + " ");
+//        }
+//        System.out.println();
+//
+//        int[] y = mergeSort(x);
+//        for (int i = 0; i < y.length; i++) {
+//            System.out.print(y[i] + " ");
+//        }
 
-        int[] y = mergeSort(x);
-        for (int i = 0; i < y.length; i++) {
-            System.out.print(y[i] + " ");
+//        x = new int[]{10, 9 ,4 ,6, 13, 5, 2, 1};
+        MaxHeap xheap = new MaxHeap(x);
+//        xheap.print();
+//        xheap.inOrder(0);
+        for (int i = 0; i < xheap.getCapacity(); i++) {
+            System.out.println(xheap.removeMax());
         }
     }
 }
