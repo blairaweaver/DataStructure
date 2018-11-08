@@ -52,7 +52,7 @@ public class Graphs {
             return this.next != null;
         }
     }
-
+// This class is for the an implementation of an Edge list
     private class EdgeNode {
         private VectorNode origin;
         private VectorNode dest;
@@ -157,10 +157,26 @@ public class Graphs {
 
 //    Currently Assuming non directional graph
 //    public int inDegree() {}
+//
+//    public getEdge() {}
+//
+//    public getVerticies() {}
 
-    public getEdge() {}
+    public boolean areAdjacent(int[][] adjMatrix, int vert1, int vert2) {
+        return adjMatrix[vert1][vert2] == 1;
+    }
 
-    public getVerticies() {}
+    public boolean areAdjacent(VectorNode[] adjList, int vert1, int vert2) {
+        VectorNode current = adjList[vert1];
+        while (current.hasNext()) {
+            int cmp = current.getElement().compareTo(vert2);
+            if (cmp == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public void insertVertex() {
         int oldSize = adjMatrix[0].length;
@@ -209,7 +225,7 @@ public class Graphs {
 
     public boolean edgeExist(int vert1, int vert2) {
         VectorNode current = adjList[vert1];
-        while (current.hasNext()) {
+        while (current != null) {
             int cmp = current.getElement().compareTo(vert2);
             if (cmp == 0) {
                 return true;
@@ -224,23 +240,32 @@ public class Graphs {
 
     private void addEdgeToList(int vert1, int vert2) {
         VectorNode current = adjList[vert1];
-        while (current.hasNext()) {
+        while (current != null && current.hasNext()) {
             current = current.getNext();
         }
-        current.setNext(new VectorNode(vert2, current, null));
+        if (current == null) {
+            adjList[vert1] = new VectorNode(vert2, null, null);
+        }
+        else current.setNext(new VectorNode(vert2, current, null));
         current = adjList[vert2];
-        while (current.hasNext()) {
+        while (current != null && current.hasNext()) {
             current = current.getNext();
         }
-        current.setNext(new VectorNode(vert1, current, null));
+        if (current == null) {
+            adjList[vert2] = new VectorNode(vert1, null, null);
+        }
+        else current.setNext(new VectorNode(vert1, current, null));
     }
 
     private void remove(int vert1, VectorNode current) {
-        while (current.hasNext()) {
+        while (current != null) {
             int cmp = current.getElement().compareTo(vert1);
             if (cmp == 0) {
                 current.getPrevious().setNext(current.getNext());
-                current.getNext().setPrevious(current.getPrevious());
+                if (current.hasNext()) {
+                    current.getNext().setPrevious(current.getPrevious());
+                }
+                current = null;
             }
             else {
                 current = current.getNext();
@@ -264,15 +289,26 @@ public class Graphs {
         for (int i = 0; i < adjMatrix.length; i++) {
             System.out.print(i + ": ");
             VectorNode current = adjList[i];
-            while (current != null && current.hasNext()) {
+            while (current != null) {
                 System.out.print(current.getElement() + " ");
+                current = current.getNext();
             }
             System.out.println();
         }
     }
 
     public static void main(String[] args) {
-        Graphs test = new Graphs(5);
-
+        Graphs test = new Graphs(6);
+        System.out.println(test.numVertices());
+        test.insertEdge(1,5);
+        test.insertEdge(1,2);
+        test.insertEdge(2,3);
+        test.insertEdge(2,4);
+        test.insertEdge(2,5);
+        test.insertEdge(4,3);
+        test.insertEdge(4,5);
+        test.print();
+        test.removeEdge(4,5);
+        test.print();
     }
 }
