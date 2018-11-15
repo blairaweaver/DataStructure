@@ -180,7 +180,7 @@ public class Assignment4 {
         }
     }
 
-    
+
 
 
     public static void main(String[] args) {
@@ -215,5 +215,26 @@ public class Assignment4 {
         Q1.BFS(1);
 
         Q1.printVisited();
+
+//        Generating Adj matrix for Q2 where the value stored is the weight
+        Assignment4 Q2 = new Assignment4(9);
+        Q2.insertEdge(1,2,22);
+        Q2.insertEdge(1,3,9);
+        Q2.insertEdge(1,4,12);
+        Q2.insertEdge(2,3,35);
+        Q2.insertEdge(2,6,36);
+        Q2.insertEdge(2,8,34);
+        Q2.insertEdge(3,6,42);
+        Q2.insertEdge(3,5,65);
+        Q2.insertEdge(3,4,4);
+        Q2.insertEdge(4,5,33);
+        Q2.insertEdge(4,9,30);
+        Q2.insertEdge(5,6,18);
+        Q2.insertEdge(5,7,23);
+        Q2.insertEdge(6,7,39);
+        Q2.insertEdge(6,8,24);
+        Q2.insertEdge(7,8,25);
+        Q2.insertEdge(7,9,21);
+        Q2.insertEdge(8,9,19);
     }
 }
