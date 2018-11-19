@@ -1,11 +1,90 @@
 //Deleted all code that pertains to the implementation of Adj List
 
 //To Do:
-//Add methods: depth traversal, breadth traversal, Kruskal's, Prim's, Dijkstra's
+//Add methods: Kruskal's, Prim's, Dijkstra's
+//Done: depth traversal, breadth traversal,
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 public class Assignment4 {
+
+    private class EdgeNode implements Comparable<EdgeNode> {
+        private int origin;
+        private int dest;
+        private int weight;
+        private EdgeNode previous;
+        private EdgeNode next;
+
+        public EdgeNode() {
+            origin = -1;
+            dest = -1;
+            previous = null;
+            next = null;
+        }
+
+        public EdgeNode(int origin, int dest, int weight) {
+            this.origin = origin;
+            this.dest = dest;
+            this.previous = null;
+            this.next = null;
+            this.weight = weight;
+        }
+
+        public int getOrigin() {
+            return origin;
+        }
+
+        public int getDest() {
+            return dest;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        //        public EdgeNode getPrevious() {
+//            return previous;
+//        }
+//
+//        public EdgeNode getNext() {
+//            return next;
+//        }
+
+        public void setOrigin(int origin) {
+            this.origin = origin;
+        }
+
+        public void setDest(int dest) {
+            this.dest = dest;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(EdgeNode edge) {
+            if (this.getWeight() > edge.getWeight()) {
+                return 1;
+            }
+            else if (this.getWeight() < edge.getWeight()) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+
+//        public void setPrevious(EdgeNode previous) {
+//            this.previous = previous;
+//        }
+//
+//        public void setNext(EdgeNode next) {
+//            this.next = next;
+//        }
+    }
 
     private int[][] adjMatrix;
 //    -1 for grey, 0 for red, 1 for black
@@ -180,8 +259,43 @@ public class Assignment4 {
         }
     }
 
+    public void Prim(int vert) {
 
+    }
 
+    public void Kruskal() {
+//        Will use visit array to keep track of the vertices that are currently in the tree
+//        -1 for not visited, 1 for visited
+        clearVist();
+//        span stores the edges that are in the tree
+        PriorityQueue<EdgeNode> queue = new PriorityQueue<>();
+        LinkedList<EdgeNode> span = new LinkedList<>();
+
+//        keep track of clusters, need some methods for this
+        ArrayList<Integer> clusters = new ArrayList<>();
+
+//        Creating and adding EdgeNodes to queue
+        for (int i = 0; i < adjMatrix.length; i++) {
+            for (int j = i; j < adjMatrix.length; j++) {
+                if (adjMatrix[i][j] != 0) {
+                    queue.add(new EdgeNode(i, j, adjMatrix[i][j]));
+                }
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            EdgeNode current = queue.poll();
+//            If either the Dest or Origin is -1, that means that it isn't in the tree yet
+//            Avoiding case of both being 1, which would form a cycle
+//            This doesn't account for if there are two separate trees that aren't connected yet, hence why my code misses two edges
+            if (visit[current.getOrigin()] == -1 || visit[current.getDest()] == -1) {
+                span.add(current);
+                visit[current.getOrigin()] = 1;
+                visit[current.getDest()] = 1;
+            }
+        }
+
+    }
 
     public static void main(String[] args) {
 //        Generating Adj Matrix for Question 1
@@ -236,5 +350,7 @@ public class Assignment4 {
         Q2.insertEdge(7,8,25);
         Q2.insertEdge(7,9,21);
         Q2.insertEdge(8,9,19);
+
+        Q2.Kruskal();
     }
 }
