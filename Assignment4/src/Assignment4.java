@@ -400,7 +400,7 @@ public class Assignment4 {
 
         dist[vert] = 0;
         
-        for (int count = 0; count < adjMatrix.length -1; count++) {
+        for (int count = 0; count < adjMatrix.length; count++) {
             int minIndex = minDist(dist, left);
 
             left[minIndex] = true;
@@ -432,7 +432,7 @@ public class Assignment4 {
     public void printDist(int[] dist) {
         System.out.println("Vertex      Distance from Source");
         for (int i = 0; i < adjMatrix.length; i++) {
-            System.out.println(visit[i] + " \t\t\t " + dist[visit[i]]);
+            System.out.println((char)(visit[i] + 65) + " \t\t\t " + dist[visit[i]]);
         }
     }
 
@@ -461,9 +461,13 @@ public class Assignment4 {
 
         Q1.print();
 
+        System.out.println("Depth First Travesal");
+
         Q1.DFS(1);
 
         Q1.printVisited();
+
+        System.out.println("Breadth First Travesal");
 
         Q1.BFS(1);
 
@@ -490,7 +494,11 @@ public class Assignment4 {
         Q2.insertEdge(7,9,21);
         Q2.insertEdge(8,9,19);
 
+        System.out.println("Prim's Algorithm");
+
         Q2.printSpan(Q2.Prim(5));
+
+        System.out.println("Kruskal's Algorithm");
 
         Q2.printSpan(Q2.Kruskal());
 
@@ -509,6 +517,8 @@ public class Assignment4 {
         Q3.insertEdge(5,6,11);
         Q3.insertEdge(6,7,7);
         Q3.insertEdge(7,8,15);
+
+        System.out.println("Dijkstra's Algorithm");
 
         Q3.printDist(Q3.Dijkstra(0));
     }
