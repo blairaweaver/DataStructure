@@ -1,15 +1,16 @@
 //Deleted all code that pertains to the implementation of Adj List
 
 //To Do:
-//Add methods: Kruskal's, Prim's, Dijkstra's
-//Done: depth traversal, breadth traversal,
+//Add methods: Dijkstra's
+//Done: depth traversal, breadth traversal, Kruskal's, Prim's,
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import static java.util.Arrays.fill;
 
 public class Assignment4 {
-
+    
     private class EdgeNode implements Comparable<EdgeNode> {
         private int origin;
         private int dest;
@@ -113,7 +114,7 @@ public class Assignment4 {
         }
     }
 
-    private void clearVist() {
+    private void clearVisit() {
         for (int i = 0; i < visit.length; i++) {
             visit[i] = -1;
         }
@@ -223,9 +224,21 @@ public class Assignment4 {
         System.out.println();
     }
 
+    public void printSpan(LinkedList<EdgeNode> span) {
+        for (int i = 0; i < span.size(); i++){
+            EdgeNode current = span.get(i);
+            if (i == span.size() - 1) {
+                System.out.println((char)(current.getOrigin() + 65) + "-" + (char)(current.getDest()+65));
+            }
+            else {
+                System.out.print((char)(current.getOrigin()+65) + "-" + (char)(current.getDest()+65) + ", ");
+            }
+        }
+    }
+
     public void DFS(int vert) {
         clearColor();
-        clearVist();
+        clearVisit();
         DFSvisit(vert);
     }
 
@@ -242,7 +255,7 @@ public class Assignment4 {
 
     public void BFS(int vert) {
         clearColor();
-        clearVist();
+        clearVisit();
         LinkedList<Integer> queue = new LinkedList<Integer>();
         queue.add(vert);
         visited(vert);
@@ -259,20 +272,44 @@ public class Assignment4 {
         }
     }
 
-    public void Prim(int vert) {
-
-    }
-
-    public void Kruskal() {
+    public LinkedList<EdgeNode> Prim(int vert) {
 //        Will use visit array to keep track of the vertices that are currently in the tree
 //        -1 for not visited, 1 for visited
-        clearVist();
+        clearVisit();
 //        span stores the edges that are in the tree
         PriorityQueue<EdgeNode> queue = new PriorityQueue<>();
         LinkedList<EdgeNode> span = new LinkedList<>();
 
-//        keep track of clusters, need some methods for this
-        ArrayList<Integer> clusters = new ArrayList<>();
+//        Add edges connected to vert given
+        for (int i = 0; i < adjMatrix[vert].length; i++) {
+            if (adjMatrix[vert][i] != 0) {
+                queue.add(new EdgeNode(vert, i, adjMatrix[vert][i]));
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            EdgeNode current = queue.poll();
+            if (visit[current.getOrigin()] == -1 || visit[current.getDest()] == -1) {
+                span.add(current);
+                visit[current.getOrigin()] = 1;
+                visit[current.getDest()] = 1;
+                for (int i = 0; i < adjMatrix[current.getDest()].length; i++) {
+                    if (adjMatrix[current.getDest()][i] != 0 && visit[i] != 1) {
+                        queue.add(new EdgeNode(current.getDest(), i, adjMatrix[current.getDest()][i]));
+                    }
+                }
+            }
+        }
+        return span;
+    }
+
+    public LinkedList<EdgeNode> Kruskal() {
+//        span stores the edges that are in the tree
+        PriorityQueue<EdgeNode> queue = new PriorityQueue<>();
+        LinkedList<EdgeNode> span = new LinkedList<>();
+
+//        keep track of clusters (subtrees)
+        ArrayList<ArrayList<Integer>> clusters = new ArrayList<>(adjMatrix.length);
 
 //        Creating and adding EdgeNodes to queue
         for (int i = 0; i < adjMatrix.length; i++) {
@@ -285,16 +322,118 @@ public class Assignment4 {
 
         while (!queue.isEmpty()) {
             EdgeNode current = queue.poll();
-//            If either the Dest or Origin is -1, that means that it isn't in the tree yet
-//            Avoiding case of both being 1, which would form a cycle
-//            This doesn't account for if there are two separate trees that aren't connected yet, hence why my code misses two edges
-            if (visit[current.getOrigin()] == -1 || visit[current.getDest()] == -1) {
+//            checks if this edge should be added
+            if (toAdd(current, clusters)) {
+//                adds edge to the span and then adjust the subtrees
                 span.add(current);
-                visit[current.getOrigin()] = 1;
-                visit[current.getDest()] = 1;
+                adjustSubtrees(current, clusters);
+            }
+        }
+        return span;
+    }
+
+    private boolean toAdd(EdgeNode x, ArrayList<ArrayList<Integer>> subTrees) {
+        int originIndex = -1, destIndex = -1;
+        for (int i =0; i < subTrees.size(); i++) {
+            if (subTrees.get(i).indexOf(x.getOrigin()) != -1) {
+                originIndex = i;
+            }
+            if (subTrees.get(i).indexOf(x.getDest()) != -1) {
+                destIndex = i;
             }
         }
 
+        if (originIndex == destIndex && originIndex != -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    private void adjustSubtrees(EdgeNode x, ArrayList<ArrayList<Integer>> subTrees) {
+        int originIndex = -1, destIndex = -1;
+        for (int i =0; i < subTrees.size(); i++) {
+            if (subTrees.get(i).indexOf(x.getOrigin()) != -1) {
+                originIndex = i;
+            }
+            if (subTrees.get(i).indexOf(x.getDest()) != -1) {
+                destIndex = i;
+            }
+        }
+
+        if (originIndex == -1 && destIndex == -1) {
+            ArrayList<Integer> temp = new ArrayList<>();
+            temp.add(x.getOrigin());
+            temp.add(x.getDest());
+            subTrees.add(temp);
+        }
+        else if (originIndex != -1 && destIndex != -1) {
+            if (originIndex < destIndex) {
+                for (int i = 0; i < subTrees.get(destIndex).size(); i++) {
+                    subTrees.get(originIndex).add(subTrees.get(destIndex).get(i));
+                }
+                subTrees.remove(destIndex);
+            }
+            else {
+                for (int i = 0; i < subTrees.get(originIndex).size(); i++) {
+                    subTrees.get(destIndex).add(subTrees.get(originIndex).get(i));
+                }
+                subTrees.remove(originIndex);
+            }
+        }
+        else if (originIndex == -1) {
+            subTrees.get(destIndex).add(x.getOrigin());
+        }
+        else {
+            subTrees.get(originIndex).add(x.getDest());
+        }
+    }
+
+    public int[] Dijkstra(int vert) {
+//        use visited to keep track of path, dist to keep track of distances from source and left to keep track of if the vert is in the path
+        clearVisit();
+        int[] dist = new int[adjMatrix.length];
+        fill(dist, Integer.MAX_VALUE);
+        Boolean[] left = new Boolean[adjMatrix.length];
+        fill(left, false);
+
+        dist[vert] = 0;
+        
+        for (int count = 0; count < adjMatrix.length -1; count++) {
+            int minIndex = minDist(dist, left);
+
+            left[minIndex] = true;
+            visited(minIndex);
+            updateDist(minIndex, dist);
+        }
+        return dist;
+    }
+    
+    private int minDist(int[] dist, Boolean[] left) {
+        int min = Integer.MAX_VALUE, minIndex = -1;
+        for (int i = 0; i < adjMatrix.length; i++) {
+            if (left[i] == false && dist[i] <= min) {
+                min = dist[i];
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    }
+    
+    private void updateDist(int vert, int[] dist) {
+        for (int i = 0; i < adjMatrix[vert].length; i++) {
+            if (adjMatrix[vert][i] != 0 && dist[vert] + adjMatrix[vert][i] < dist[i]) {
+                dist[i] = dist[vert] + + adjMatrix[vert][i];
+            }
+        }
+    }
+
+    public void printDist(int[] dist) {
+        System.out.println("Vertex      Distance from Source");
+        for (int i = 0; i < adjMatrix.length; i++) {
+            System.out.println(visit[i] + " \t\t\t " + dist[visit[i]]);
+        }
     }
 
     public static void main(String[] args) {
@@ -351,6 +490,26 @@ public class Assignment4 {
         Q2.insertEdge(7,9,21);
         Q2.insertEdge(8,9,19);
 
-        Q2.Kruskal();
+        Q2.printSpan(Q2.Prim(5));
+
+        Q2.printSpan(Q2.Kruskal());
+
+//        Generating Adj matrix for Q4 where the value stored is the weight
+        Assignment4 Q3 = new Assignment4(8);
+        Q3.insertEdge(1,2,5);
+        Q3.insertEdge(1,5,4);
+        Q3.insertEdge(2,3,6);
+        Q3.insertEdge(2,5,3);
+        Q3.insertEdge(2,6,14);
+        Q3.insertEdge(2,7,10);
+        Q3.insertEdge(3,4,1);
+        Q3.insertEdge(3,7,9);
+        Q3.insertEdge(3,8,17);
+        Q3.insertEdge(4,8,12);
+        Q3.insertEdge(5,6,11);
+        Q3.insertEdge(6,7,7);
+        Q3.insertEdge(7,8,15);
+
+        Q3.printDist(Q3.Dijkstra(0));
     }
 }
